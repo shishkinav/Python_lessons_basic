@@ -78,9 +78,34 @@ input('Посмотрите результат и нажмите Enter')
 # !!!P.S.: функция не должна НИЧЕГО print'ить
 
 def lucky_ticket(ticket_number):
-    pass
+    list = []
+    # раскладываем полученное значение посимвольно в список в виде целочисленных
+    for i in str(ticket_number):
+        list.append(int(i))
+    # если билет состсоит из 6 символов, то начинаем обрабатывать
+    if len(list) == 6:
+        # обнуляем значения сумм
+        sum1 = sum2 = 0
+        # рассчитываем сумму первых трёх и последних трёх элементов
+        for n in range(3):
+            sum1 += list[n]
+            sum2 += list[n+3]
+        # проверяем счатливчика
+        if sum1 == sum2:
+            return True
+        # если в счастье не повезло - повезет в любви
+        else:
+            return False
+    # если количество символов билета не соответствует шести, то это фейк
+    else:
+        return False
 
+print('--- Задача 2 - уровень Easy - конец ---')
 
 print(lucky_ticket(123006))
 print(lucky_ticket(12321))
 print(lucky_ticket(436751))
+print(lucky_ticket(436752))
+
+print('--- Задача 2 - уровень Easy - конец ---')
+input('Посмотрите результат и нажмите Enter')
