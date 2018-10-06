@@ -127,3 +127,34 @@ print('--- Задача 1 - уровень Hard - конец ---')
 # Подсказка:
 # Чтобы получить список больших букв русского алфавита:
 # print(list(map(chr, range(ord('А'), ord('Я')+1))))
+print('--- Задача 3 - уровень Hard - начало ---')
+
+def createListFiles(equalName):
+    '''
+    функция создаёт в каталоге data/listFruits файлы с заваемым пользователем именем в конце каждого файла
+    приставка "_" и все большие буквы алфавита
+    '''
+    for i in list(map(chr, range(ord('А'), ord('Я')+1))):
+        path = os.path.join('data/listFruits', equalName + '_' + i)
+        with open(path, 'w', encoding='UTF-8') as file:
+            file.write('Список фруктов на букву "{}"\n'.format(i))
+
+# задаём постоянную часть имени будущих файлов
+equalName = 'Список'
+# создаём пул побуквенных списков
+createListFiles(equalName)
+
+# считываем построчно главный файл
+with open('data/fruits.txt', 'r', encoding='UTF-8') as file:
+    for i in file:
+        # запускаем цикл от А до Я
+        for simbol in list(map(chr, range(ord('А'), ord('Я')+1))):
+            # если первый символ строки соответствует букве итерации, то даём команду на дозапись
+            if simbol == i[0:1]:
+                # дозапись будет осуществлена в файл со стандартным для всех именем, подчёркиванием и simbol итерации
+                path = os.path.join('data/listFruits', equalName + '_' + simbol)
+                with open(path, 'a', encoding='UTF-8') as file:
+                    file.write('{}\n'.format(i))
+
+
+print('--- Задача 3 - уровень Hard - конец ---')
