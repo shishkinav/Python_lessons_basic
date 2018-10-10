@@ -22,6 +22,33 @@ line = 'mtMmEZUOmcqWiryMQhhTxqKdSTKCYEJlEZCsGAMkgAYEOmHBSQsSUHKvSfbmxULaysmNO'\
        'XiUWgsKQrDOeZoNlZNRvHnLgCmysUeKnVJXPFIzvdDyleXylnKBfLCjLHntltignbQoiQ'\
        'zTYwZAiRwycdlHfyHNGmkNqSwXUrxGc'
 
+import re
+
+# как вариант через регулярку мы можем либо найти все рядом стоящие комбинации нижнего регистра, либо сплитануть по комбинациям верхнего регистра
+f = re.findall(r'[a-z]+', line)
+p = re.split(r'[A-Z]+', line)
+# если надо вывести два результата уберите коммент print(f, 'длина - ', len(f), '\n', p, 'длина - ', len(f))
+
+# реализация без применения re
+value = ''
+list_element = []
+# перебираем все символы строки
+for simbol in line:
+    if simbol.islower():
+        value += simbol     # при каждой итерации если символ маленький, то дописываем в спец переменную
+
+    else:
+        if value != '':     # если попадаем на большой символ, то проверяем не пуста ли спец переменная и если не пуста передаем её накопление в спец список, при этом обнуляем её
+            list_element.append(value)
+            value=''
+if value != '':
+    list_element.append(value)
+
+print(list_element)
+print(len(list_element))
+
+
+
 
 # Задание-2:
 # Вывести символы в верхнем регистре, слева от которых находятся
