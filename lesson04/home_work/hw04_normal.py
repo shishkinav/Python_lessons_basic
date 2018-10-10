@@ -139,3 +139,42 @@ print(listBig, 'длина списка без использования рег
 # 2500-значное произвольное число.
 # Найдите и выведите самую длинную последовательность одинаковых цифр
 # в вышезаполненном файле.
+import re, random, os
+
+# формируем список значений из 2500 стринговых элементов
+list2500simbol = [str(random.randint(0, 9)) for _ in range(2500)]
+spNumber = ''
+
+# преобразуем все элементы списка в одну строку
+for _ in list2500simbol:
+    spNumber += _
+
+# записываем наше число в файл
+path = os.path.join('data', '2500simbols.txt')
+with open(path, 'w', encoding='UTF-8') as file:
+    file.write(spNumber)
+
+with open(path, 'r', encoding='UTF-8') as file:
+    p = file.readlines()
+
+
+maximum = countElement = 0
+sprav = []
+
+# проверяем для каждого элемента количество повторений подряд и сохраняем в переменной maximum
+for element in range(10):
+    for number in range(2500):
+        if element == int(p[0][number]):
+            countElement += 1
+            if maximum < countElement:
+                maximum = countElement
+        else:
+            countElement = 0
+    # по завершении проверки каждого элемента, максимальное количество повторений подряд заносится в справочный список
+    sprav.append(maximum)
+# выводим результат рассмотрения последовательных повторений по самым максимальным
+print('\nСамая длинная последовательность у чисел:\n')
+for _ in range(10):
+    if sprav[_] == max(sprav):
+        print('  {} - повторяется в ряду {} раз(а);\n' .format(_, max(sprav)))
+
