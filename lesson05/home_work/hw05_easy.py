@@ -5,7 +5,7 @@ __author__ = 'Шишкин Анатолий'
 # из которой запущен данный скрипт.
 # И второй скрипт, удаляющий эти папки.
 
-import os
+import os, re
 
 def addDir(nameDir):
     '''
@@ -47,6 +47,26 @@ if __name__ == "__main__":
 
 # Задача-2:
 # Напишите скрипт, отображающий папки текущей директории.
+
+def seeCatalog (path, param):
+    '''
+    функция выводит пользователю содержимое каталога, находящегося по адресу path, в зависимости от параметра
+    'file' - отобразит только файлы
+    'dir' - отобразит только папки
+    'all' - отобразит всё содержимое текущего каталога
+    '''
+    if param == 'file':
+        print([el for el in os.listdir(path) if re.search('[.]+\w+', el)])
+    elif param == 'dir':
+        print([el for el in os.listdir(path) if not re.search('[.]+\w+', el)])
+    elif param == 'all':
+        print([el for el in os.listdir(path)])
+    else:
+        print('указан неверный параметр для отображения (используйте file, dir или all')
+
+seeCatalog(os.getcwd(), 'file')
+seeCatalog(os.getcwd(), 'dir')
+seeCatalog(os.getcwd(), 'all')
 
 # Задача-3:
 # Напишите скрипт, создающий копию файла, из которого запущен данный скрипт.
