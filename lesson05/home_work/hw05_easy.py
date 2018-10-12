@@ -64,9 +64,11 @@ def seeCatalog (path, param):
     else:
         print('указан неверный параметр для отображения (используйте file, dir или all')
 
-seeCatalog(os.getcwd(), 'file')
-seeCatalog(os.getcwd(), 'dir')
-seeCatalog(os.getcwd(), 'all')
+# чтобы не импортировалось в другие файлы
+if __name__ == "__main__":
+    seeCatalog(os.getcwd(), 'file')
+    seeCatalog(os.getcwd(), 'dir')
+    seeCatalog(os.getcwd(), 'all')
 
 # Задача-3:
 # Напишите скрипт, создающий копию файла, из которого запущен данный скрипт.
