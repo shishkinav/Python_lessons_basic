@@ -1,3 +1,6 @@
+#!/usr/local/bin/python3.6
+# coding: utf-8
+
 __author__ = 'Шишкин Анатолий'
 
 # Задание-1:
