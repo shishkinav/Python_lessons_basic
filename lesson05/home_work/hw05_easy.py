@@ -58,7 +58,7 @@ if __name__ == "__main__":
 # Задача-2:
 # Напишите скрипт, отображающий папки текущей директории.
 
-def seeCatalog (path, param = None):
+def seeCatalog (path = '.', param = None):
     '''
     функция выводит пользователю содержимое каталога, находящегося по адресу path, в зависимости от параметра
     'file' - отобразит только файлы
@@ -107,7 +107,7 @@ def copyFile(nameFile, path, pathFuture = None):
         print('проверьте путь и имя файла - таких не существует')
 
 # далее код будет работать, только если мы будем запускать этот скрипт, при импортировании ниже строчки не сработают
-if __name__ == "__main__":
-    copyFile(os.getcwd(), os.path.basename(__file__), '../examples/my_libs/')   # скопирует открытый файл в новую папку
-    copyFile(os.getcwd(), os.path.basename(__file__))                          # скопирует открытый файл в ту же папку
-    copyFile(os.getcwd(), 'file')                                               # скажет об отсутствии такого файла
+#if __name__ == "__main__":
+#    copyFile(os.getcwd(), os.path.basename(__file__), '../examples/my_libs/')   # скопирует открытый файл в новую папку
+#    copyFile(os.getcwd(), os.path.basename(__file__))                          # скопирует открытый файл в ту же папку
+#    copyFile(os.getcwd(), 'file')                                               # скажет об отсутствии такого файла
