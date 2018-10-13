@@ -7,6 +7,16 @@ __author__ = 'Шишкин Анатолий'
 
 import os, re, shutil
 
+def changeDir(path):
+    '''
+    функция осуществляет переход в указанную директорию
+    '''
+    try:
+        os.chdir(path)
+        print('переход совершен успешно')
+    except FileNotFoundError:
+        print('переход невозможен, такая директорая не существует')
+
 def addDir(nameDir):
     '''
     функция создаёт в текущей директории папку с передаваемым именем
@@ -48,21 +58,27 @@ if __name__ == "__main__":
 # Задача-2:
 # Напишите скрипт, отображающий папки текущей директории.
 
-def seeCatalog (path, param):
+def seeCatalog (path, param = None):
     '''
     функция выводит пользователю содержимое каталога, находящегося по адресу path, в зависимости от параметра
     'file' - отобразит только файлы
     'dir' - отобразит только папки
     'all' - отобразит всё содержимое текущего каталога
     '''
-    if param == 'file':
-        print([el for el in os.listdir(path) if re.search('[.]+\w+', el)])
-    elif param == 'dir':
-        print([el for el in os.listdir(path) if not re.search('[.]+\w+', el)])
-    elif param == 'all':
-        print([el for el in os.listdir(path)])
-    else:
-        print('указан неверный параметр для отображения (используйте file, dir или all')
+    # если для просмотра каталога параметр не передан, то по умолчанию будет отображено всё содержимое папки
+    if param == None:
+        param = 'all'
+    try:
+        if param == 'file':
+            print([el for el in os.listdir(path) if re.search('[.]+\w+', el)])
+        elif param == 'dir':
+            print([el for el in os.listdir(path) if not re.search('[.]+\w+', el)])
+        elif param == 'all':
+            print([el for el in os.listdir(path)])
+        else:
+            print('указан неверный параметр для отображения (используйте file, dir или all')
+    except FileNotFoundError:
+        print('введенной вами директории не существует')
 
 # чтобы не импортировалось в другие файлы
 if __name__ == "__main__":
@@ -73,7 +89,7 @@ if __name__ == "__main__":
 # Задача-3:
 # Напишите скрипт, создающий копию файла, из которого запущен данный скрипт.
 
-def copyFile(path, nameFile, pathFuture = None):
+def copyFile(nameFile, path, pathFuture = None):
     '''
     функция копирует файл из директории path (в скрипте своём можете использовать os.getcwd()) в директорию pathFuture
     (если копируете файл в ту же директорию, то оставьте третий параметр пустым), в качестве второго параметра
@@ -86,6 +102,7 @@ def copyFile(path, nameFile, pathFuture = None):
             pathFuture = path
         # копируем файл комбинируя кросплатформенно пути и добавляя к имени в начале текст 'copy_'
         shutil.copy(os.path.join(path, nameFile), os.path.join(pathFuture, 'copy_' + nameFile))
+        print('файл с именем {} скопирован в директорию {}' .format(nameFile, pathFuture))
     except FileNotFoundError:
         print('проверьте путь и имя файла - таких не существует')
 

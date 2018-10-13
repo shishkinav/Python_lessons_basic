@@ -15,3 +15,51 @@ __author__ = 'Шишкин Анатолий'
 # Для решения данной задачи используйте алгоритмы из задания easy,
 # оформленные в виде соответствующих функций,
 # и импортированные в данный файл из easy.py
+
+import lesson05.home_work.hw05_easy as my_modul
+import sys, os
+
+
+def print_help():
+    '''
+    функция выводи пользователю справку по доступным действиям
+    '''
+    print("help - получение справки")
+    print("mkdir <dir_name> - создание директории")
+    print("chdir <path_dir> - переход в директорию")
+    print("rmdir <dir_name> - удаление директории в текущем каталоге")
+    print("listdir <path_dir> param - просмотр директории [параметры: file - отобразит только файлы указанной директории,"
+          "dir - отобразит только папки указанной директории, all или оставьте параметр не заполненным - отобразит всё"
+          "содержимое указанной директории]")
+
+# справочник действий по ключам пользователя
+do = {
+    "help": print_help,
+    "mkdir": my_modul.addDir,
+    "chdir": my_modul.changeDir,
+    "rmdir": my_modul.delDir,
+    "listdir": my_modul.seeCatalog
+}
+
+# проверка третьего передаваемого параметра
+try:
+    dir_name = sys.argv[2]
+except IndexError:
+    dir_name = None
+
+# проверка второго передаваемого параметра
+try:
+    key = sys.argv[1]
+except IndexError:
+    key = None
+
+# если ключ был передан, то получаем функцию по ключу
+if key:
+    if do.get(key):
+        do[key]()
+    else:
+        print("Задан неверный ключ")
+        print("Укажите ключ help для получения справки")
+
+do['chdir']('..')
+do['listdir']('.')
