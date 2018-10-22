@@ -62,18 +62,18 @@ import sys
 import time
 
 class Cask:
-    # Достаем бочонки по 1 штуке
+    # класс Бочёнок для выдачи требуемого количества значений в нужном диапазоне
     def f(self):
-        lst = [x for x in range(1, self.amount + 1)]
-        random.shuffle(lst)
-        for i, y in enumerate(lst):
-            print('{:*^30}'.format('*'))
-            print('Новый бочонок: {} (осталось {})'.format(y, self.amount - (i + 1)))
-            yield y
+        lst = [x for x in range(1, self.amount + 1)] # генерируем список значений от 1 до заданного пользователем
+        random.shuffle(lst)     # перемешиваем значения в списке случайным образом
+        for i, y in enumerate(lst): # проходим по i-му индексу нумерованного списка со значениями этих элементов y
+            print('{:*^30}'.format('*'))    # маркер автозаполнения
+            print('Новый бочонок: {} (осталось {})'.format(y, self.amount - (i + 1))) # информирование о текущем значении и оставшемся кол-ве
+            yield y # возврат значения нового бочёнка в игру
 
     def __init__(self, amount):
-        self.amount = amount
-        self.gen = self.f()
+        self.amount = amount    # количество бочёноков, задаваемое для игрового процесса
+        self.gen = self.f()     # имя в классе для передачи итерируемого значения нового бочёнка
 
 
 class Loto:
