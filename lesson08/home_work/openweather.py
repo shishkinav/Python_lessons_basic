@@ -123,3 +123,160 @@ OpenWeatherMap — онлайн-сервис, который предостав�
 
 """
 
+import requests, os, re, datetime
+import json, sqlite3
+
+baseName = 'weather.sqlite' # глобальная переменная с названием базы данных
+
+def listCountry():
+    '''
+    функция возврата уникальных кодов стран по имеющимся в локальной базе городам
+    '''
+    try:
+        with sqlite3.connect(baseName) as conn:
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("select * from weather")
+            listCnt = []
+            for row in cur.fetchall():
+                idCity, city, country, date, temperature, idWeather = row
+                listCnt.append(country)
+            return set(listCnt)
+    except sqlite3.OperationalError:
+        createBase()
+        listCountry()
+
+# инициировать проверку idCity на наличие в базе данных
+def parsCityListJson():
+    '''
+    функция парсит исходный JSON файл со списком городов, проверяет есть ли такие города в локальной базе и
+    если нет, то актуализирует сведения и дописывает в базу
+    '''
+    path = os.path.join('lib', 'city.list.json')
+    with open(path, 'r', encoding='UTF-8') as file:
+        with sqlite3.connect(baseName) as conn:
+            try:
+                result = json.loads(file.read())
+                tempListLocalId = listLocalID()
+                for stroka in result:
+                    if stroka['id'] in tempListLocalId:
+                        print('Id существует')
+                        continue
+                    else:
+                        try:
+                            el = requestIdTown(stroka['id'])
+                            # Записываем новые данные в локальную базу
+                            conn.execute("""
+                                                insert into weather (idCity, city, country, date, temperature, idWeather) VALUES (?,?,?,?,?,?)""",
+                                         (
+                                             stroka['id'],
+                                             stroka['name'],
+                                             stroka['country'],
+                                             datetime.date.today(),
+                                             el[0],
+                                             el[1]
+                                         )
+                                         )
+                            # информируем пользователя, что запись создана
+                            print('добавлена строка', stroka['id'], stroka['name'], stroka['country'], datetime.date.today(), el[0], el[1])
+
+                        except TypeError:
+                            pass
+            except sqlite3.IntegrityError:
+                pass
+            except sqlite3.OperationalError:
+                createBase()
+
+
+def requestIdTown(id = 707860): # 5601538 - Москва
+    '''
+    функция, получая id города, отправляет запрос на API и после получения возвращает данные температуры и кода погоды
+    '''
+    try:
+        s=requests.get('http://api.openweathermap.org/data/2.5/weather?id='+ str(id) + '&units=metric&appid=52773c4f40a2d698eb8ea071bece011a')
+        data = json.loads(s.text)
+
+        return data['main']['temp'], data['weather'][0]['id']
+    except:
+        print('Ошибка запроса данных по API для idCity = ', id)
+
+def createBase(baseName = baseName):
+    # Указываем название файла базы данных
+    try:
+        conn = sqlite3.connect(baseName)
+        # Создаем схемы в базе данных
+        with sqlite3.connect(baseName) as conn:
+            conn.execute('''
+                create table weather (
+                    idCity      integer primary key,
+                    city        varchar(255),
+                    country     varchar(255),
+                    date        date,
+                    temperature integer,
+                    idWeather  integer
+                );
+                ''')
+    except sqlite3.OperationalError:
+        print('База данных с таким именем уже создана')
+
+
+
+def viewValueBase(param = None, baseName = baseName):
+    '''
+    Функция обращения к локальной базе данных для просмотра данных по запросу.
+     param = 'all' - отобразит всю локальную базу значений
+     param = '<country>' - отобразит записи по введенной стране, например, 'RU' - увидим все города России из базы
+    '''
+    try:
+        with sqlite3.connect(baseName) as conn:
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("select * from weather")
+            print('{:<10}{:<50}{:<10}{:<17}{:<15}{:<15}'.format('id_города', 'Город', 'Страна', 'Обновлялось',
+                                                                'Температура', 'id_погоды'))
+            for row in cur.fetchall():
+                idCity, city, country, date, temperature, idWeather = row
+                if param == 'all':
+                    print('{:<10}{:<50}{:<10}{:<17}{:<15}{:<15}'.format(idCity, city, country, date, temperature,
+                                                                        idWeather))
+                elif str(country) == param:
+                    print('{:<10}{:<50}{:<10}{:<17}{:<15}{:<15}'.format(idCity, city, country, date, temperature,
+                                                                        idWeather))
+                else:
+                    print('Параметер не был указан')
+
+    except sqlite3.OperationalError:
+        createBase()
+        viewValueBase()
+
+def updateValueBase(idCity, date, temperature, baseName = baseName):
+    '''
+    функция обновляет значение температуры и меняет дату обновления в записи локальной базы по id города
+    '''
+    with sqlite3.connect(baseName) as conn:
+        cur = conn.cursor()
+        cur.execute("select * from weather")
+        # обновление значения в базе данных
+        cur.execute("update weather set date=:date, temperature=:temperature where idCity=:idCity",
+                    {'date': date, 'temperature': temperature, 'idCity': idCity})
+
+def listLocalID(baseName = baseName):
+    '''
+    функция обновляет значение температуры и меняет дату обновления в записи локальной базы по id города
+    '''
+    try:
+        listID = []
+        with sqlite3.connect(baseName) as conn:
+            cur = conn.cursor()
+            cur.execute("select * from weather")
+            for row in cur.fetchall():
+                idCity, city, country, date, temperature, idWeather = row
+                listID.append(idCity)
+        return listID
+    except sqlite3.OperationalError:
+        createBase()
+        listLocalID()
+
+parsCityListJson()      # освоили все исходные данные
+
+viewValueBase('all')
