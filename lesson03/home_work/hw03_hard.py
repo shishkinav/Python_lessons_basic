@@ -1,3 +1,5 @@
+__author__ = 'Шишкин Анатолий Васильевич'
+
 # Задание-1:
 # Написать программу, выполняющую операции (сложение и вычитание) с простыми дробями.
 # Дроби вводятся и выводятся в формате:
@@ -18,6 +20,100 @@
 # они получают удвоенную ЗП, пропорциональную норме.
 # Кол-во часов, которые были отработаны, указаны в файле "data/hours_of"
 
+print('--- Задача 2 - уровень Hard - начало ---')
+import os
+
+def clearList(nameFile):
+    '''
+    Функция принимает имя файла, который хранится в каталоге
+    с именем data, проводит первичную очистку данных от лишних
+    символов и возвращает список списков по каждой строке
+    значений для возможности работы с ним
+    '''
+    listMy = []
+    # объявляем комбинацию символов которую хотим убрать в конце строки
+    endLine = '\n'
+    path = os.path.join('data', nameFile)
+    # открываем файл, перебираем строки и переносим их в свой список
+    with open(path, 'r', encoding='UTF-8') as f:
+        for line in f:
+            if endLine in line:
+                listMy.append(line[:-1])
+            else:
+                listMy.append(line)
+    currentList = []
+    # перебираем строки нашего списка и отделяем слова по пробелам
+    for i in listMy:
+        currentList.append(i.split(' '))
+    listMy = []
+    # чистим каждые список элементов по строке от пустых элементов
+    for i in currentList:
+        listMy.append(list(filter(len, i)))
+    # возвращаем из функции очищенный список списков значений построчно
+    return listMy
+
+def findHoursPeople(name, sername, listFind):
+    '''
+    функция принимает имя, фамилию и список точного формата [[Имя],[Фамилия],[Отработано часов]], из которого по
+    имени и фамилии возвращает значение отработанного количества часов
+    '''
+    for i in listFind:
+        # возврат значения осуществляется только при полном одновременном совпадении имя и фамилии
+        if i[0] == name and i[1] == sername:
+            return i[2]
+
+def countSalary(listWorkers, listHoursOfWorkers):
+    '''
+    Выполняет расчёт ЗП для сотрудника, получая от нас список списков данных о работнике формата:
+    [Имя, Фамилия, Зарплата, Должность, Норма_часов] и список списков данных формата: [Имя, Фамилия, Отработано часов]
+    '''
+    listSalary = [['Имя', 'Фамилия', 'Выручка'],]
+    for people in listWorkers:
+        if people == listWorkers[0]:
+            continue
+        # для лучше читабельности кода решил вынести значения в переменные
+        hoursWorked = int(findHoursPeople(people[0], people[1], listHoursOfWorkers))    # отработано часов
+        hoursNorm = int(people[4])                                                      # норма часов
+        salaryNorm = int(people[2])                                                     # зарплатная ставка
+
+        # делаем проверку переработал сотрудник или не доработал и делаем соответствующий расчет ЗП
+        if (hoursWorked / hoursNorm) > 1:
+            # человек-трудяга, ему надо заплатить: ЗП + двойную ставку за каждый переработанный час
+            salary = int(salaryNorm + (salaryNorm / hoursNorm) * (hoursWorked - hoursNorm) * 2)
+        else:
+            # человек-лентяй, хорошо бы вообще не заплатить, но трудовое законодательство заставляет уменьшить пропорционально
+            salary = int(salaryNorm - (salaryNorm / hoursNorm) * (hoursNorm - hoursWorked))
+
+        # в каждой итерации после расчёта, фиксируем данные в нашем списке
+        listSalary.append([people[0], people[1], salary])
+    return listSalary
+
+# собственно начало нашего путешествия )) - чистим два исходных файла и получаем списки списков значений для работы
+listWorkers = clearList('workers')
+listHoursOfWorkers = clearList('hours_of')
+
+# создаём конечный файл с шапкой новой таблицы, если файл существует заменяем его новым
+path = os.path.join('data', 'salaryWorkers')
+with open(path, 'w', encoding='UTF-8') as f:
+    f.write('{:<10}{:<14}{:<10}\n' .format('Имя', 'Фамилия', 'Выручка'))
+
+# дописываем данные в наш файл
+path = os.path.join('data', 'salaryWorkers')
+with open(path, 'a', encoding='UTF-8') as f:
+    '''
+    перебираем все полученные списком списки
+    !!! Обратите внимание, что на этом этапе в дело вступает функция countSalary !!!
+    '''
+    for i in countSalary(listWorkers, listHoursOfWorkers):
+        # учитывая, что наша функция формирует тоже шапку, мы отбросим первый проход, чтобы он не дописывался
+        if i == countSalary(listWorkers, listHoursOfWorkers)[0]:
+            continue
+        # дописываем каждую строчку по работнику в наш файл
+        f.write('{:<10}{:<14}{:<10}\n' .format(i[0], i[1], i[2]))
+
+# Информируем пользователя, что файл создан
+print('Файл создан ищите в {}.' .format(path))
+print('--- Задача 2 - уровень Hard - конец ---')
 
 # Задание-3:
 # Дан файл ("data/fruits") со списком фруктов.
@@ -31,3 +127,34 @@
 # Подсказка:
 # Чтобы получить список больших букв русского алфавита:
 # print(list(map(chr, range(ord('А'), ord('Я')+1))))
+print('--- Задача 3 - уровень Hard - начало ---')
+
+def createListFiles(equalName):
+    '''
+    функция создаёт в каталоге data/listFruits файлы с заваемым пользователем именем в конце каждого файла
+    приставка "_" и все большие буквы алфавита
+    '''
+    for i in list(map(chr, range(ord('А'), ord('Я')+1))):
+        path = os.path.join('data/listFruits', equalName + '_' + i)
+        with open(path, 'w', encoding='UTF-8') as file:
+            file.write('Список фруктов на букву "{}"\n'.format(i))
+
+# задаём постоянную часть имени будущих файлов
+equalName = 'Список'
+# создаём пул побуквенных списков
+createListFiles(equalName)
+
+# считываем построчно главный файл
+with open('data/fruits.txt', 'r', encoding='UTF-8') as file:
+    for i in file:
+        # запускаем цикл от А до Я
+        for simbol in list(map(chr, range(ord('А'), ord('Я')+1))):
+            # если первый символ строки соответствует букве итерации, то даём команду на дозапись
+            if simbol == i[0:1]:
+                # дозапись будет осуществлена в файл со стандартным для всех именем, подчёркиванием и simbol итерации
+                path = os.path.join('data/listFruits', equalName + '_' + simbol)
+                with open(path, 'a', encoding='UTF-8') as file:
+                    file.write('{}\n'.format(i))
+
+
+print('--- Задача 3 - уровень Hard - конец ---')
