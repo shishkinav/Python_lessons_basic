@@ -1,3 +1,5 @@
+__author__ = 'Шишкин Анатолий Васиельвич'
+
 # Задание-1:
 # Вывести символы в нижнем регистре, которые находятся вокруг
 # 1 или более символов в верхнем регистре.
@@ -20,6 +22,33 @@ line = 'mtMmEZUOmcqWiryMQhhTxqKdSTKCYEJlEZCsGAMkgAYEOmHBSQsSUHKvSfbmxULaysmNO'\
        'XiUWgsKQrDOeZoNlZNRvHnLgCmysUeKnVJXPFIzvdDyleXylnKBfLCjLHntltignbQoiQ'\
        'zTYwZAiRwycdlHfyHNGmkNqSwXUrxGc'
 
+import re
+
+# как вариант через регулярку мы можем либо найти все рядом стоящие комбинации нижнего регистра, либо сплитануть по комбинациям верхнего регистра
+f = re.findall(r'[a-z]+', line)
+p = re.split(r'[A-Z]+', line)
+# если надо вывести два результата уберите коммент print(f, 'длина - ', len(f), '\n', p, 'длина - ', len(f))
+
+# реализация без применения re
+value = ''
+list_element = []
+# перебираем все символы строки
+for simbol in line:
+    if simbol.islower():
+        value += simbol     # при каждой итерации если символ маленький, то дописываем в спец переменную
+
+    else:
+        if value != '':     # если попадаем на большой символ, то проверяем не пуста ли спец переменная и если не пуста передаем её накопление в спец список, при этом обнуляем её
+            list_element.append(value)
+            value=''
+if value != '':
+    list_element.append(value)
+
+print(list_element)
+print(len(list_element))
+
+
+
 
 # Задание-2:
 # Вывести символы в верхнем регистре, слева от которых находятся
@@ -28,7 +57,10 @@ line = 'mtMmEZUOmcqWiryMQhhTxqKdSTKCYEJlEZCsGAMkgAYEOmHBSQsSUHKvSfbmxULaysmNO'\
 # "GAMkgAYEOmHBSQsSUHKvSfbmxULaysmNOGIPHpEMujalpPLNzRWXfwHQqwksrFeipEUlTLec"
 # нужно получить список строк: ['AY', 'NOGI', 'P']
 # Решить задачу двумя способами: с помощью re и без.
-
+'''
+использовал для проверок урывками
+line_2 = 'mtMmEZUOmcqWiryMQhhTxqKdSTKCYEJlEZCsGAMkgAYEOmHB'
+'''
 line_2 = 'mtMmEZUOmcqWiryMQhhTxqKdSTKCYEJlEZCsGAMkgAYEOmHBSQsSUHKvSfbmxULaysm'\
        'NOGIPHpEMujalpPLNzRWXfwHQqwksrFeipEUlTLeclMwAoktKlfUBJHPsnawvjPhfgewV'\
        'fzKTUfSYtBydXaVIpxWjNKgXANvIoumesCSSvjEGRJosUfuhRRDUuTQwLlJJJDdkVjfSA'\
@@ -45,9 +77,104 @@ line_2 = 'mtMmEZUOmcqWiryMQhhTxqKdSTKCYEJlEZCsGAMkgAYEOmHBSQsSUHKvSfbmxULaysm'\
        'JFaXiUWgsKQrDOeZoNlZNRvHnLgCmysUeKnVJXPFIzvdDyleXylnKBfLCjLHntltignbQ'\
        'oiQzTYwZAiRwycdlHfyHNGmkNqSwXUrxGC'
 
+import re
+
+listUpperSimbol = re.findall(r'[a-z]{2}([A-Z]+)[A-Z]{2}', line_2) # регулярка - это зверь
+print(listUpperSimbol, 'длина списка с помощью регулярки - ', len(listUpperSimbol))
+
+# теперь выполняем задачу муторно без регулярки
+# решение мне подсказали, самостоятельно не разобрался (((, пришлось разбираться по чужому коду
+
+countUpper = 0      # вводим переменную для подсчёта количества верхнерегистровых символов
+listBig = []        # объявляем пустой список для хранения элементов
+
+# запускаем перебор индексов исходной строки начиная с третьего символа
+for indexElement in range(2, len(line_2)):
+    # если символ строки с текущим индексом верхнеристровый и при этом если есть срез двух нижнерегистровых элементов подряд
+    # срез line_2 [текущий индекс элемента - количество ранее найденных до этого верхнерегистровых элемента - 2 :
+    # текущий индекс элемента - кол-во ранее найденных до этого верхнерегистровых элемента]. кол-во верхнерегистровых
+    # используется для того, чтобы смешать срез влево на кол-во уже пройденных верхних символов и заодно считать их
+    if line_2[indexElement].isupper() and line_2[indexElement - countUpper - 2 : indexElement - countUpper].islower():
+        countUpper += 1
+    # если мы дошли до этого условия, значит очередной элемент не является верхнерегистровым, проверяем набрано ли нужно количество верхнерегистровых
+    elif countUpper <= 2:   # в данном случае не набрали нужного количества
+        countUpper = 0      # обнуляем для следующей проверки
+    elif countUpper > 2:    # а здесь набрали и передаём наш срез верхнерегистровых в список уменьшая срез на два символа справа
+        listBig.append(line_2[indexElement - countUpper : indexElement - 2])
+        countUpper = 0      # обнуляем для следующей проверки
+# добавлено дублирование на случай, если кол-во индексов строки в цикле закончится, но не хватит итерации для проверки (если в конце исходной строки к примеру стоит три большие буквы
+if countUpper > 2:
+    listBig.append(line_2[indexElement - countUpper: indexElement - 2])
+
+    '''
+    моя наверное пятая переделка так и не удавшегося кода (((
+for simbol in line_2:
+    if simbol.islower():
+        if len(value) > 2:
+            listBig.append(value[:-2])
+            countLower = 0
+            value = ''
+        elif line_2[(line_2.index(simbol) - 1)].isupper():
+            countLower = 0
+            value = ''
+        else:
+            value = ''
+
+        countLower += 1
+    elif simbol.isupper():
+        if countLower < 2:
+            countLower = 0
+            value = ''
+        else:
+            value += simbol
+'''
+
+print(listBig, 'длина списка без использования регулярки - ', len(listBig))
+
+
+
 # Задание-3:
 # Напишите скрипт, заполняющий указанный файл (самостоятельно задайте имя файла)
 # произвольными целыми цифрами, в результате в файле должно быть
 # 2500-значное произвольное число.
 # Найдите и выведите самую длинную последовательность одинаковых цифр
 # в вышезаполненном файле.
+import re, random, os
+
+# формируем список значений из 2500 стринговых элементов
+list2500simbol = [str(random.randint(0, 9)) for _ in range(2500)]
+spNumber = ''
+
+# преобразуем все элементы списка в одну строку
+for _ in list2500simbol:
+    spNumber += _
+
+# записываем наше число в файл
+path = os.path.join('data', '2500simbols.txt')
+with open(path, 'w', encoding='UTF-8') as file:
+    file.write(spNumber)
+
+with open(path, 'r', encoding='UTF-8') as file:
+    p = file.readlines()
+
+
+maximum = countElement = 0
+sprav = []
+
+# проверяем для каждого элемента количество повторений подряд и сохраняем в переменной maximum
+for element in range(10):
+    for number in range(2500):
+        if element == int(p[0][number]):
+            countElement += 1
+            if maximum < countElement:
+                maximum = countElement
+        else:
+            countElement = 0
+    # по завершении проверки каждого элемента, максимальное количество повторений подряд заносится в справочный список
+    sprav.append(maximum)
+# выводим результат рассмотрения последовательных повторений по самым максимальным
+print('\nСамая длинная последовательность у чисел:\n')
+for _ in range(10):
+    if sprav[_] == max(sprav):
+        print('  {} - повторяется в ряду {} раз(а);\n' .format(_, max(sprav)))
+
